@@ -2,7 +2,7 @@ name: Sync
 
 on:
   schedule:
-    - cron: "0 * * * *" # Hourly
+    - cron: "7 * * * *" # Hourly
   workflow_dispatch:
     inputs:
       catch_up:
@@ -19,14 +19,14 @@ on:
 permissions: {}
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
   sync:
     name: Sync Board
     runs-on: ubuntu-26.04
-    timeout-minutes: 5
+    timeout-minutes: ${{ inputs.catch_up && 60 || 5 }}
     permissions:
       contents: read
     steps:
