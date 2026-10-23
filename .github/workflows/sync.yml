@@ -10,6 +10,11 @@ on:
         required: false
         default: false
         type: boolean
+      dry_run:
+        description: 'Dry run: execute in read-only mode'
+        required: false
+        default: false
+        type: boolean
 
 permissions: {}
 
@@ -33,6 +38,6 @@ jobs:
         with:
           github_token: ${{ secrets.PROJECT_SYNC_TOKEN }}
           config_path: rules.yml
-          dry_run: 'true'
+          dry_run: ${{ inputs.dry_run || false }}
           backfill: ${{ inputs.catch_up && 'all' || '' }}
           verbose: 'true'
