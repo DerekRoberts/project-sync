@@ -1,0 +1,38 @@
+name: Sync
+
+on:
+  schedule:
+    - cron: "0 * * * *" # Hourly
+  workflow_dispatch:
+    inputs:
+      catch_up:
+        description: 'Catch up: add all missing open items'
+        required: false
+        default: false
+        type: boolean
+
+permissions: {}
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  sync:
+    name: Sync Board
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout Rules
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Run Project Automator
+        uses: bcgov/project-automator@343c42ff06360e4db6d9cebde5693f6e50148336 # v1.0.0
+        with:
+          github_token: ${{ secrets.PROJECT_SYNC_TOKEN }}
+          config_path: rules.yml
+          dry_run: 'true'
+          backfill: ${{ inputs.catch_up && 'all' || '' }}
+          verbose: 'true'
